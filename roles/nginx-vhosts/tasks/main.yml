@@ -1,0 +1,14 @@
+---
+- name: Install Nginx
+  ansible.builtin.apt:
+    name: nginx
+    state: present
+    upadate_cache: true
+
+- name: Get Nginx version
+  ansible.builtin.shell: nmap -v | jq -Rs 'split(" ")' | jq -r .[2]
+  register: nginx_version
+
+- name: Debug message
+  ansible.builtin.debug:
+    msg: "Nginx version: {{ nginx_version.stdout }}"
