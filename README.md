@@ -170,9 +170,8 @@ server {
 
 ## Проверка
 
-1. на мастер-ноде запускаем сценарий командой `ansible-playbook playbook.yml -i inventory.ini`  
+1. на мастер-ноде MASTER (10.0.2.15) запускаем сценарий командой `ansible-playbook playbook.yml -i inventory.ini`  
 - ключ `--diff` используем для построчного отображения изменений на целевом хосте  
-
 2. проверяем командой `curl 10.0.2.16 -H 'Host: etis.com'`, должны получить вывод:
 ```bash
 <HTML>
@@ -181,16 +180,7 @@ server {
     <BODY>
 </HTML>
 ```
-10. также, в браузере из хостовой ОС (предварительно исправив файл hosts)   
-`http://fizfak.ru:8080/` (помним, что с прошлых лабораторных настроена  
-трансляция порта 8080:80 для SLAVE)
-
-+++++++++++вставить картинку++++++++++
-  
-
-Проверяем playbook на ошибки:  
-`ansible-playbook playbook.yml -i inventory.ini --check`
-
-Запускаем playbook из текущей директории:  
-`ansible-playbook playbook.yml -i inventory.ini --diff`
+3. также, в браузере из хостовой ОС (предварительно исправив файл hosts: `127.0.0.1 fizfak.ru`) открываем сайт  
+`http://fizfak.ru:8080/` (помним, что с прошлых лабораторных настроена трансляция порта 8080:80 для SLAVE)
+<img width="551" height="239" alt="image" src="https://github.com/user-attachments/assets/64c4fbb9-754f-455d-80d9-8679a77e92f3" />
 
