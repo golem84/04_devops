@@ -21,7 +21,6 @@
     group: root
     mode: '0644'
   loop: '{{ nginx_sites }}'
-#  notify: Restart Nginx
 
 - name: Create sites folders
   ansible.builtin.file:
@@ -40,9 +39,10 @@
     group: root
     mode: '0644'
   loop: '{{ nginx_sites }}'
+  notify: Restart Nginx
 
 # instead of Notify nginx
-- name: Force ngnix restart
-  ansible.builtin.service:
-    name: nginx
-    state: restarted
+#- name: Force ngnix restart
+#  ansible.builtin.service:
+#    name: nginx
+#    state: restarted
