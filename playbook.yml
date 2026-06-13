@@ -6,7 +6,7 @@
   become_method: sudo
 
   vars:
-  - nginx-sites:
+    nginx-sites:
     - "etis.com"
     - "fizfak.ru"
     - "mehmat.ru"
