@@ -1,0 +1,9 @@
+---
+- name: Install Nginx and create vhosts
+  hosts: webservers
+  remote_user: runner
+  become: true
+  become_method: sudo
+
+  roles:
+  - nginx-vhosts
