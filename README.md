@@ -7,3 +7,4 @@
 
 Запускаем playbook из текущей директории:  
 `ansible-playbook playbook.yml -i inventory.ini`
+
