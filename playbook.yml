@@ -5,5 +5,11 @@
   become: true
   become_method: sudo
 
+  vars:
+  - nginx-sites:
+    - "etis.com"
+    - "fizfak.ru"
+    - "mehmat.ru"
+
   roles:
   - nginx-vhosts
