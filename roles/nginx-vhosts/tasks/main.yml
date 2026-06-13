@@ -20,7 +20,7 @@
     owner: root
     group: root
     mode: '0644'
-  loop: '{{ nginx-sites }}'
+  loop: '{{ nginx_sites }}'
 #  notify: Restart Nginx
 
 - name: Create sites folders
@@ -30,7 +30,7 @@
     owner: root
     group: root
     mode: '0755'
-  loop: '{{ nginx-sites }}'
+  loop: '{{ nginx_sites }}'
 
 - name: Copy index from template
   template: 
@@ -39,7 +39,7 @@
     owner: root
     group: root
     mode: '0644'
-  loop: '{{ nginx-sites }}'
+  loop: '{{ nginx_sites }}'
 
 # instead of Notify nginx
 - name: Force ngnix restart
