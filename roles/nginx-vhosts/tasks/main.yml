@@ -6,7 +6,7 @@
     update_cache: true
 
 - name: Get Nginx version
-  ansible.builtin.shell: nginx -v 2>&1 | jq -R 'split(" ")' | jq .[2]
+  ansible.builtin.shell: nginx -v 2>&1 | jq -R 'split(" ")' | jq -r '.[2]'
   register: nginx_version
 
 - name: Debug message
