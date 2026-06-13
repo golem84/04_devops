@@ -18,7 +18,7 @@
   become: true
   become_method: sudo
 ```
-- указываем роль, применяемую к группе хостов `webservers`
+- указываем роль, применяемую к группе хостов `webservers`:
 ```yml
   roles:
   - nginx-vhosts
@@ -32,7 +32,16 @@
     - "fizfak.ru"
     - "mehmat.ru"
 ```
-3. создаем шаблон конфигурационного файла site.conf `./roles/nginx-vhosts/templates/site.conf.j2`:
+3. создаем структуру папок для роли `nginx-vhosts`:
+```bash
+./roles
+    ┗━ nginx-vhosts
+        ┣━ handlers
+        ┣━ tasks
+        ┗━ templates
+```
+
+3. создаем шаблон конфигурационного файла site.conf `/templates/site.conf.j2`:
 ```j2
 server {
     listen 80;
@@ -48,7 +57,7 @@ server {
     }
 }
 ```
-4. создаем шаблон файла index.html `./roles/nginx-vhosts/templates/index.html.j2`:
+4. создаем шаблон файла index.html `/templates/index.html.j2`:
 ```html
 <HTML>
     <BODY>
@@ -58,7 +67,7 @@ server {
 ```
 
 ## Создание роли
-создаем структуру папок для роли `ngins-vhosts`, добавляем файл с задачами для роли `tasks/main.yml`, в задачах указываем что хотим делать:
+добавляем файл с задачами для роли `tasks/main.yml`, в задачах указываем что хотим делать:
 1. убеждаемся что установлен Nginx при помощи модуля `ansible.builtin.apt`, при этом 
 - обновляем кэш пакетов `update_cache: true`
 - версия пакета последняя `state: latest`
@@ -80,13 +89,13 @@ server {
 ```
 3. Выводим значение переменной `nginx_version`:
 - при помощи модуля `ansible.builtin.debug` выводим диагностическое сообщение
+- указываем параметр msg: `"{{ nginx_version.stdout }}"`
 ```yml
 - name: Print Nginx version
   ansible.builtin.debug:
     msg: "Nginx version: {{ nginx_version.stdout }}"
 ```
-- указываем параметр msg: `"{{ nginx_version.stdout }}"`
-4. копируем конфигурационный файл при помощи `ansible.builtin.template` в папку `/etc/nginx/conf.d/` 
+4. копируем конфигурационный файл на хосты при помощи `ansible.builtin.template` в папку `/etc/nginx/conf.d/` 
 ```yml
 - name: Copy nginx.conf from template
   ansible.builtin.template:
@@ -108,7 +117,29 @@ server {
     mode: '0755'
   loop: '{{ nginx_sites }}'
 ```
-6. копируем индексную страницу при помощи `ansible.builtin.template` в папку `/var/www/<имя_сайта>` 
+6. копируем индексную страницу на хосты при помощи `ansible.builtin.template` в папку `/var/www/<имя_сайта>` 
+```yml
+- name: Copy index from template
+  ansible.builtin.template: 
+    src: 'index.html.j2'
+    dest: '/var/www/{{ item }}/index.html'
+    owner: root
+    group: root
+    mode: '0644'
+  loop: '{{ nginx_sites }}'
+#  notify: Restart Nginx
+```
+7. принудительно перезагружаем Nginx при помоищи `ansible.builtin.service` с параметром `name: nginx`, `state: restarted` 
+```yml
+# instead of Notify nginx
+- name: Force ngnix restart
+  ansible.builtin.service:
+    name: nginx
+    state: restarted
+```
+
+7. 7a: когда сценарий настроен и выполняется успешно, можно включить handler в `/tasks/main.yml`. Для этого:
+- раскомментируем строку `# notify: Restart Nginx` для задачи `Copy index from template`
 ```yml
 - name: Copy index from template
   ansible.builtin.template: 
@@ -120,17 +151,7 @@ server {
   loop: '{{ nginx_sites }}'
   notify: Restart Nginx
 ```
-7. принудительно перезагружаем Nginx при помоищи `ansible.builtin.service` с параметром `name: nginx`, `state: restarted` 
-```yml
-# instead of Notify nginx
-- name: Force ngnix restart
-  ansible.builtin.service:
-    name: nginx
-    state: restarted
-```
-
-7. 7a: когда сценарий настроен и выполняется успешно, можно включить handler в `./roles/nginx-vhosts/tasks/main.yml`. Для этого:
-- раскомментируем строку в `handlers/main.yml` `#  notify: Restart Nginx` для задачи `Copy index from template`
+- добавим или раскомментируем задачу в `handlers/main.yml`:
 ```yml
 ---
 - name: Restart Nginx
@@ -146,6 +167,7 @@ server {
 #    name: nginx
 #    state: restarted
 ```
+
 ## Проверка
 
 1. на мастер-ноде запускаем сценарий командой `ansible-playbook playbook.yml -i inventory.ini`  
