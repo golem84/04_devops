@@ -11,4 +11,4 @@
 
 - name: Debug message
   ansible.builtin.debug:
-    msg: "Nginx version:{{ nginx_version.stdout_lines }}"
+    msg: "Nginx version:{{ nginx_version.stdout }}"
