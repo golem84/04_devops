@@ -9,6 +9,40 @@
   ansible.builtin.shell: nginx -v 2>&1 | jq -R 'split(" ")' | jq -r '.[2]'
   register: nginx_version
 
-- name: Debug message
+- name: Print Nginx version
   ansible.builtin.debug:
     msg: "Nginx version: {{ nginx_version.stdout }}"
+
+- name: Copy nginx.conf from template
+  ansible.builtin.template:
+    src: 'site.conf.j2'
+    dest: '/etc/nginx/conf.d/site-{{ item }}.conf'
+    owner: root
+    group: root
+    mode: '0644'
+  loop: '{{ nginx_sites }}'
+
+- name: Create sites folders
+  ansible.builtin.file:
+    path: '/var/www/{{ item }}/'
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+  loop: '{{ nginx_sites }}'
+
+- name: Copy index from template
+  ansible.builtin.template: 
+    src: 'index.html.j2'
+    dest: '/var/www/{{ item }}/index.html'
+    owner: root
+    group: root
+    mode: '0644'
+  loop: '{{ nginx_sites }}'
+  notify: Restart Nginx
+
+# instead of Notify nginx
+#- name: Force ngnix restart
+#  ansible.builtin.service:
+#    name: nginx
+#    state: restarted
